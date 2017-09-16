@@ -4,7 +4,22 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 #include <iostream>
 using namespace std;
-KalmanFilter::KalmanFilter() {}
+KalmanFilter::KalmanFilter() {
+  F_ = MatrixXd(4, 4);
+  F_ << 1, 0, 1, 0,
+    0, 1, 0, 1,
+    0, 0, 1, 0,
+    0, 0, 0, 1;
+  
+  P_ = MatrixXd(4, 4);
+  P_ << 1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1000, 0,
+    0, 0, 0, 1000;
+  
+  Q_ = MatrixXd(4, 4);
+
+}
 
 KalmanFilter::~KalmanFilter() {}
 
