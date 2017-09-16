@@ -53,8 +53,25 @@ void KalmanFilter::Update(const VectorXd &z) {
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  /**
-  TODO:
-    * update the state by using Extended Kalman Filter equations
-  */
+
+  // cout<<"Update: Begin"<<endl;
+  // cout<<"Update shapes x_"<<x_.rows()<<","<<x_.cols();
+  // cout<<" shapes H_"<<H_.rows()<<","<<H_.cols();
+  // cout<<" shapes P_"<<P_.rows()<<","<<P_.cols();
+  // cout<<" shapes z"<<z.rows()<<","<<z.cols();
+  VectorXd z_pred = H_ * x_;
+  //cout<<" shapes z_pred"<<z_pred.rows()<<","<<z_pred.cols();
+  VectorXd y = z - z_pred;
+  MatrixXd Ht = H_.transpose();
+  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd Si = S.inverse();
+  MatrixXd PHt = P_ * Ht;
+  MatrixXd K = PHt * Si;
+
+  //new estimate
+  x_ = x_ + (K * y);
+  long x_size = x_.size();
+  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  P_ = (I - K * H_) * P_;
+
 }
