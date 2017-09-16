@@ -3,7 +3,16 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 #include <iostream>
+#include "tools.h"
+
 using namespace std;
+
+void NormalizeAngle(double& phi)
+{
+  phi = atan2(sin(phi), cos(phi));
+}
+
+
 KalmanFilter::KalmanFilter() {
   F_ = MatrixXd(4, 4);
   F_ << 1, 0, 1, 0,
@@ -68,15 +77,17 @@ void KalmanFilter::Update(const VectorXd &z) {
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
-
+  Tools tools;
   // cout<<"Update: Begin"<<endl;
   // cout<<"Update shapes x_"<<x_.rows()<<","<<x_.cols();
   // cout<<" shapes H_"<<H_.rows()<<","<<H_.cols();
   // cout<<" shapes P_"<<P_.rows()<<","<<P_.cols();
   // cout<<" shapes z"<<z.rows()<<","<<z.cols();
+  H_=tools.CalculateJacobian(x_);
   VectorXd z_pred = H_ * x_;
   //cout<<" shapes z_pred"<<z_pred.rows()<<","<<z_pred.cols();
   VectorXd y = z - z_pred;
+  NormalizeAngle(y(1));//convert to -pi to pi
   MatrixXd Ht = H_.transpose();
   MatrixXd S = H_ * P_ * Ht + R_;
   MatrixXd Si = S.inverse();

@@ -1,5 +1,4 @@
 #include "FusionEKF.h"
-#include "tools.h"
 #include "Eigen/Dense"
 #include <iostream>
 #include <math.h>
@@ -114,7 +113,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   ekf_.F_(0, 2) = dt;
   ekf_.F_(1, 3) = dt;
 
-  // Set H_ to H_laser_ for the predict step
+  // Set H_ to H_laser_ for the predict step 
   ekf_.H_=H_laser_;
   ekf_.R_=R_laser_;
   //set the process covariance matrix Q
@@ -136,25 +135,15 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Update the state and covariance matrices.
    */
 
-
-
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-    // Radar updates
-    VectorXd measurement_vec=VectorXd(4);
-    measurement_vec<<0.0,0.0,0.0,0.0;
-    double rho=measurement_pack.raw_measurements_[0];
-    double phi=measurement_pack.raw_measurements_[1];
-    double rho_dot=measurement_pack.raw_measurements_[2];
-    Tools tools;
-    measurement_vec << rho*cos(phi), rho*sin(phi), rho_dot*cos(phi),rho_dot*sin(phi);
-    //cout<<"Jacobian begin ..";
-    ekf_.H_=tools.CalculateJacobian(measurement_vec);
     ekf_.R_=R_radar_;
     //cout<<" Jacobian end"<<endl;
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } 
   else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
     // Laser updates
+    ekf_.H_=H_laser_;
+    ekf_.R_=R_laser_;
     ekf_.Update(measurement_pack.raw_measurements_);
   }
   
