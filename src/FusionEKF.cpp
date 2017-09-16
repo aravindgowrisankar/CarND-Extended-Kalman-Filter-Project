@@ -47,22 +47,7 @@ FusionEKF::FusionEKF() {
 FusionEKF::~FusionEKF() {}
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
-  ekf_.x_ =VectorXd(4);
-  ekf_.x_<<0.0,0.0,0.0,0.0;
 
-  MatrixXd F_ = MatrixXd(4, 4);
-  F_ << 1, 0, 1, 0,
-    0, 1, 0, 1,
-    0, 0, 1, 0,
-    0, 0, 0, 1;
-
-  MatrixXd P_ = MatrixXd(4, 4);
-  P_ << 1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1000, 0,
-    0, 0, 0, 1000;
-
-  MatrixXd Q_ = MatrixXd(4, 4);
 
   /*****************************************************************************
    *  Initialization
@@ -98,8 +83,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     }
 
     // done initializing, no need to predict or update
-
-    ekf_.Init(initial,P_,F_,H_laser_,R_laser_,Q_);
+    ekf_.x_=initial;
+    ekf_.H_=H_laser_;
+    ekf_.R_=R_laser_;
     is_initialized_ = true;
     return;
   }
