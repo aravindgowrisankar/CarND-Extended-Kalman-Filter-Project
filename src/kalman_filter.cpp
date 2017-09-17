@@ -84,7 +84,19 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   // cout<<" shapes P_"<<P_.rows()<<","<<P_.cols();
   // cout<<" shapes z"<<z.rows()<<","<<z.cols();
   H_=tools.CalculateJacobian(x_);
-  VectorXd z_pred = H_ * x_;
+  
+  VectorXd z_pred(3);
+  double px = x_(0);
+  double py = x_(1);
+  double vx = x_(2);
+  double vy = x_(3);
+
+  double c1 = std::max(0.001,sqrt(px*px+py*py));
+  double c2 = atan2(py, px);
+  double c3 = px*vx + py*vy;
+
+  z_pred << c1, c2, c3/c1;
+
   //cout<<" shapes z_pred"<<z_pred.rows()<<","<<z_pred.cols();
   VectorXd y = z - z_pred;
   NormalizeAngle(y(1));//convert to -pi to pi
